@@ -1,0 +1,6 @@
+require('vue')
+require('vuex')
+require('nodemailer')
+require('bootstrap')
+require('bootstrap-vue')
+require('core-js')
