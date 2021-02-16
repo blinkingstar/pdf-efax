@@ -1,17 +1,26 @@
 module.exports = {
   pluginOptions: {
     electronBuilder: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      builderOptions: {
+        appId: "net.blinkingstar.pdf-efax",
+        productName: "PDF eFax",
+        win:{
+          target: [
+            "zip",
+            {
+              "target": "nsis",
+              "arch": [
+                "x64"
+              ]
+            }
+          ]
+        },
+        extraResources: [
+          "scansnap.ini"
+        ],
+      },
     },
-    "builderOptions":{
-      "appId": "net.blinkingstar.pdf-efax",
-      "productName": "PDF eFax",
-      "win":{
-        "target": "portable",
-        "arch": [
-          "x64"
-        ]
-      }
-    },
+    
   }
 }

@@ -309,7 +309,12 @@
               required
             ></b-form-input>
           </b-form-group>
-          <b-button v-on:click="saveSetting" variant="primary">Save</b-button>
+          <b-form-group>
+            <b-button v-on:click="saveSetting" variant="primary">Save</b-button>
+          </b-form-group>
+          <b-form-group>
+            <b-button v-on:click="setScanSnap" variant="primary">Set ScanSnap</b-button>
+          </b-form-group>
         </b-form>
         </b-col>
     </b-row>
@@ -332,7 +337,7 @@
 
 <script>
 import {
- // ipcRenderer // <- レンダー用のipc
+  ipcRenderer // <- レンダー用のipc
 } from 'electron'
 // let config = this.$store.state.config;
 // nodemailer.createTransport({
@@ -351,12 +356,11 @@ import {
 export default {
   name: 'Home',
   data: function () {
-      return {
-          dismissSecs: 3,
-          dismissCountDown: 0,
-          showDismissibleAlert: false,
-          
-      };
+    return {
+      dismissSecs: 3,
+      dismissCountDown: 0,
+      showDismissibleAlert: false,
+    };
   },
   computed: {
     config() {
@@ -371,6 +375,10 @@ export default {
       // ipcRenderer.send('configupdate',config);
       // this.$router.go('/')
       return false;
+    },
+    setScanSnap: async function (){
+      const result = await ipcRenderer.invoke('setscansnap');
+      console.log(result);
     },
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown

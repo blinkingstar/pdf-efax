@@ -122,7 +122,65 @@ app.on('ready', async () => {
     }
     event.returnValue = argv;
   });
+  ipcMain.handle('setscansnap', async (event) => {
+    const { spawnSync } = require('child_process');
+    const iconv = require("iconv-lite");
+    const path = require('path');
+    const key = 'HKLM:\\SOFTWARE\\Wow6432Node\\PFU\\ScanSnap Extension';
+    const verkey = 'HKLM:\\SOFTWARE\\Wow6432Node\\PFU\\ScanSnap Software';
+    const keyname = "blinkingstar2Fax";
+    const exepath = app.getPath("exe");
+    const dirname = path.dirname(exepath);
+    // const appver = app.getVersion();
+    // const appverlist = appver.split('.');
+    
+    console.log(dirname);
+    // 
+    // powershell -Command "Start-Process PowerShell -ArgumentList \"New-Item -Path 'HKLM:\\SOFTWARE\\Wow6432Node\\PFU\\ScanSnap Extension' -name 'blinkingstar'  -value 'test'\" -Verb runas"
+    spawnSync('powershell', [
+      '-WindowStyle', 'Hidden',
+      '-Command',
+      'Start-Process PowerShell -WindowStyle hidden -ArgumentList "New-Item -Path \'' + key + '\' -name \'' + keyname + 
+      '\' -value \'' + exepath + '\'" -Verb runas',
+    ], { windowsHide: true });
+    spawnSync('powershell', [
+      '-WindowStyle', 'Hidden',
+      '-Command',
+      'Start-Process PowerShell -WindowStyle hidden -ArgumentList "New-ItemProperty -Path \'' + key + '\\' + keyname +
+       '\' -name \'Config\' -value \'' + path.join(dirname, "resources", "scansnap.ini") + '\'" -Verb runas',
+    ], { windowsHide: true });
+    spawnSync('powershell', [
+      '-WindowStyle', 'Hidden',
+      '-Command',
+      'Start-Process PowerShell -WindowStyle hidden -ArgumentList "New-ItemProperty -Path \'' + key + '\\' + keyname +
+       '\' -name \'Path\' -value \'' + dirname + '\'" -Verb runas',
+    ], { windowsHide: true });
+    spawnSync('powershell', [
+      '-WindowStyle', 'Hidden',
+      '-Command',
+      'Start-Process PowerShell -WindowStyle hidden -ArgumentList "New-ItemProperty -Path \'' + verkey + '\\' + keyname +
+       '\' -name \'Version\' -value \'' +  app.getVersion() + '.0\'" -Verb runas',
+    ], { windowsHide: true });
 
+    // ScanSnapReg[key] = {
+    //   'DEFAULT': {
+    //     value: exepath,
+    //     type: 'REG_DEFAULT'
+    //   },
+    //   'Config': {
+    //     value: path.join(dirname, "resources", "scansnap.ini"),
+    //     type: 'REG_SZ'
+    //   },
+    //   'Path': {
+    //     value: dirname,
+    //     type: 'REG_SZ'
+    //   }
+    // };
+    // regedit.putValue(ScanSnapReg, function(err) {
+    //   console.log(err);
+    // });
+    return "registed for ScanSnap";
+  });
   ipcMain.handle('deleteaddressbook', async (event) => {
     const delete_confirm = await dialog.showMessageBox({
       type: 'warning',  // none/info/error/question/warning
@@ -148,7 +206,7 @@ app.on('ready', async () => {
   ipcMain.handle('openfile', async (event,arg) => {
     console.log('opening');
     const filePath = await dialog.showOpenDialog({
-      defaultPath: arg,
+      defaultPath: arg || app.getPath("documents"),
       filters: [{name: 'PDF', extensions: ['pdf']}],
       properties: ['openFile'] }
     );
